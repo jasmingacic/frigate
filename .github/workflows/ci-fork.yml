@@ -33,12 +33,21 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
+          # Per non-scratch FROM:
+          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
+          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
+          #   3. apt::Retries for transient errors.
+          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
-              'fi || true',
+              'fi; '
+              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
+              '  [ -f "$s" ] && sed -i -E "s|http://(deb\\.debian\\.org/debian-security)|https://\\1|g; s|http://(security\\.debian\\.org)|https://\\1|g" "$s" || true; '
+              'done; true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
@@ -86,12 +95,21 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
+          # Per non-scratch FROM:
+          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
+          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
+          #   3. apt::Retries for transient errors.
+          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
-              'fi || true',
+              'fi; '
+              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
+              '  [ -f "$s" ] && sed -i -E "s|http://(deb\\.debian\\.org/debian-security)|https://\\1|g; s|http://(security\\.debian\\.org)|https://\\1|g" "$s" || true; '
+              'done; true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
@@ -150,12 +168,21 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
+          # Per non-scratch FROM:
+          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
+          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
+          #   3. apt::Retries for transient errors.
+          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
-              'fi || true',
+              'fi; '
+              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
+              '  [ -f "$s" ] && sed -i -E "s|http://(deb\\.debian\\.org/debian-security)|https://\\1|g; s|http://(security\\.debian\\.org)|https://\\1|g" "$s" || true; '
+              'done; true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
@@ -210,12 +237,21 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
+          # Per non-scratch FROM:
+          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
+          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
+          #   3. apt::Retries for transient errors.
+          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
-              'fi || true',
+              'fi; '
+              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
+              '  [ -f "$s" ] && sed -i -E "s|http://(deb\\.debian\\.org/debian-security)|https://\\1|g; s|http://(security\\.debian\\.org)|https://\\1|g" "$s" || true; '
+              'done; true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
@@ -280,12 +316,21 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
+          # Per non-scratch FROM:
+          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
+          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
+          #   3. apt::Retries for transient errors.
+          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
-              'fi || true',
+              'fi; '
+              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
+              '  [ -f "$s" ] && sed -i -E "s|http://(deb\\.debian\\.org/debian-security)|https://\\1|g; s|http://(security\\.debian\\.org)|https://\\1|g" "$s" || true; '
+              'done; true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
@@ -335,12 +380,21 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
+          # Per non-scratch FROM:
+          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
+          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
+          #   3. apt::Retries for transient errors.
+          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
-              'fi || true',
+              'fi; '
+              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
+              '  [ -f "$s" ] && sed -i -E "s|http://(deb\\.debian\\.org/debian-security)|https://\\1|g; s|http://(security\\.debian\\.org)|https://\\1|g" "$s" || true; '
+              'done; true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
