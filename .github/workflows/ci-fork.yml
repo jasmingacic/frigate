@@ -28,19 +28,16 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: Patch apt to dodge Fastly 451 (no-pipeline + mirror swap)
+      - name: Inject apt-cacher-ng proxy into Dockerfiles
         shell: bash
         run: |
           python3 - <<'PY'
           import os, re, glob
           patch_lines = [
-              'RUN set -e; '
-              'if [ -d /etc/apt/apt.conf.d ]; then '
-              '  echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
-              'fi; '
-              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
-              '  [ -f "$s" ] && sed -i "s|deb\\.debian\\.org|ftp.de.debian.org|g; s|security\\.debian\\.org|ftp.de.debian.org/debian-security|g" "$s" || true; '
-              'done; true',
+              'RUN if [ -d /etc/apt/apt.conf.d ]; then '
+              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
@@ -83,19 +80,16 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: Patch apt to dodge Fastly 451 (no-pipeline + mirror swap)
+      - name: Inject apt-cacher-ng proxy into Dockerfiles
         shell: bash
         run: |
           python3 - <<'PY'
           import os, re, glob
           patch_lines = [
-              'RUN set -e; '
-              'if [ -d /etc/apt/apt.conf.d ]; then '
-              '  echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
-              'fi; '
-              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
-              '  [ -f "$s" ] && sed -i "s|deb\\.debian\\.org|ftp.de.debian.org|g; s|security\\.debian\\.org|ftp.de.debian.org/debian-security|g" "$s" || true; '
-              'done; true',
+              'RUN if [ -d /etc/apt/apt.conf.d ]; then '
+              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
@@ -149,19 +143,16 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: Patch apt to dodge Fastly 451 (no-pipeline + mirror swap)
+      - name: Inject apt-cacher-ng proxy into Dockerfiles
         shell: bash
         run: |
           python3 - <<'PY'
           import os, re, glob
           patch_lines = [
-              'RUN set -e; '
-              'if [ -d /etc/apt/apt.conf.d ]; then '
-              '  echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
-              'fi; '
-              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
-              '  [ -f "$s" ] && sed -i "s|deb\\.debian\\.org|ftp.de.debian.org|g; s|security\\.debian\\.org|ftp.de.debian.org/debian-security|g" "$s" || true; '
-              'done; true',
+              'RUN if [ -d /etc/apt/apt.conf.d ]; then '
+              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
@@ -211,19 +202,16 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: Patch apt to dodge Fastly 451 (no-pipeline + mirror swap)
+      - name: Inject apt-cacher-ng proxy into Dockerfiles
         shell: bash
         run: |
           python3 - <<'PY'
           import os, re, glob
           patch_lines = [
-              'RUN set -e; '
-              'if [ -d /etc/apt/apt.conf.d ]; then '
-              '  echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
-              'fi; '
-              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
-              '  [ -f "$s" ] && sed -i "s|deb\\.debian\\.org|ftp.de.debian.org|g; s|security\\.debian\\.org|ftp.de.debian.org/debian-security|g" "$s" || true; '
-              'done; true',
+              'RUN if [ -d /etc/apt/apt.conf.d ]; then '
+              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
@@ -283,19 +271,16 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: Patch apt to dodge Fastly 451 (no-pipeline + mirror swap)
+      - name: Inject apt-cacher-ng proxy into Dockerfiles
         shell: bash
         run: |
           python3 - <<'PY'
           import os, re, glob
           patch_lines = [
-              'RUN set -e; '
-              'if [ -d /etc/apt/apt.conf.d ]; then '
-              '  echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
-              'fi; '
-              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
-              '  [ -f "$s" ] && sed -i "s|deb\\.debian\\.org|ftp.de.debian.org|g; s|security\\.debian\\.org|ftp.de.debian.org/debian-security|g" "$s" || true; '
-              'done; true',
+              'RUN if [ -d /etc/apt/apt.conf.d ]; then '
+              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
@@ -340,19 +325,16 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: Patch apt to dodge Fastly 451 (no-pipeline + mirror swap)
+      - name: Inject apt-cacher-ng proxy into Dockerfiles
         shell: bash
         run: |
           python3 - <<'PY'
           import os, re, glob
           patch_lines = [
-              'RUN set -e; '
-              'if [ -d /etc/apt/apt.conf.d ]; then '
-              '  echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
-              'fi; '
-              'for s in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do '
-              '  [ -f "$s" ] && sed -i "s|deb\\.debian\\.org|ftp.de.debian.org|g; s|security\\.debian\\.org|ftp.de.debian.org/debian-security|g" "$s" || true; '
-              'done; true',
+              'RUN if [ -d /etc/apt/apt.conf.d ]; then '
+              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
               if not os.path.isfile(f):
