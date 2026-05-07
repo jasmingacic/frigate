@@ -13,13 +13,18 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  RUNNER: arc-runner-set-frigate
+# Two clusters back this workflow:
+#   - capybara (172.16.0.25)  → x86 runner-set "arc-runner-set-frigate"
+#   - GH200    (172.16.0.20)  → arm64 runner-set "arc-runner-set-frigate-arm64"
+# Each has its own apt-cacher-ng exposed on hostPort 3142. Per-job APT_PROXY env
+# selects the right one. The Dockerfile patch step reads $APT_PROXY at runtime.
 
 jobs:
   amd64_build:
     runs-on: arc-runner-set-frigate
     name: AMD64 Build
+    env:
+      APT_PROXY: http://172.16.0.25:3142
     steps:
       - name: Install build tooling
         run: |
@@ -33,14 +38,10 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
-          # Per non-scratch FROM:
-          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
-          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
-          #   3. apt::Retries for transient errors.
-          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
+          proxy = os.environ.get('APT_PROXY', 'http://172.16.0.25:3142')
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
-              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              f'echo "Acquire::http::Proxy \\"{proxy}\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
@@ -80,8 +81,10 @@ jobs:
           cache-to: type=registry,ref=${{ steps.setup.outputs.cache-name }}-amd64,mode=max
 
   arm64_build:
-    runs-on: arc-runner-set-frigate
+    runs-on: arc-runner-set-frigate-arm64
     name: ARM Build
+    env:
+      APT_PROXY: http://172.16.0.20:3142
     steps:
       - name: Install build tooling
         run: |
@@ -95,14 +98,10 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
-          # Per non-scratch FROM:
-          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
-          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
-          #   3. apt::Retries for transient errors.
-          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
+          proxy = os.environ.get('APT_PROXY', 'http://172.16.0.25:3142')
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
-              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              f'echo "Acquire::http::Proxy \\"{proxy}\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
@@ -153,8 +152,10 @@ jobs:
             *.cache-to=type=registry,ref=${{ steps.setup.outputs.cache-name }}-arm64,mode=max
 
   jetson_jp6_build:
-    runs-on: arc-runner-set-frigate
+    runs-on: arc-runner-set-frigate-arm64
     name: Jetson Jetpack 6
+    env:
+      APT_PROXY: http://172.16.0.20:3142
     steps:
       - name: Install build tooling
         run: |
@@ -168,14 +169,10 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
-          # Per non-scratch FROM:
-          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
-          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
-          #   3. apt::Retries for transient errors.
-          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
+          proxy = os.environ.get('APT_PROXY', 'http://172.16.0.25:3142')
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
-              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              f'echo "Acquire::http::Proxy \\"{proxy}\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
@@ -224,6 +221,8 @@ jobs:
     name: AMD64 Extra Build
     needs:
       - amd64_build
+    env:
+      APT_PROXY: http://172.16.0.25:3142
     steps:
       - name: Install build tooling
         run: |
@@ -237,14 +236,10 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
-          # Per non-scratch FROM:
-          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
-          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
-          #   3. apt::Retries for transient errors.
-          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
+          proxy = os.environ.get('APT_PROXY', 'http://172.16.0.25:3142')
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
-              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              f'echo "Acquire::http::Proxy \\"{proxy}\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
@@ -299,10 +294,12 @@ jobs:
             *.cache-to=type=registry,ref=${{ steps.setup.outputs.cache-name }}-rocm,mode=max
 
   arm64_extra_builds:
-    runs-on: arc-runner-set-frigate
+    runs-on: arc-runner-set-frigate-arm64
     name: ARM Extra Build
     needs:
       - arm64_build
+    env:
+      APT_PROXY: http://172.16.0.20:3142
     steps:
       - name: Install build tooling
         run: |
@@ -316,14 +313,10 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
-          # Per non-scratch FROM:
-          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
-          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
-          #   3. apt::Retries for transient errors.
-          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
+          proxy = os.environ.get('APT_PROXY', 'http://172.16.0.25:3142')
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
-              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              f'echo "Acquire::http::Proxy \\"{proxy}\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
@@ -363,10 +356,12 @@ jobs:
             *.cache-to=type=registry,ref=${{ steps.setup.outputs.cache-name }}-rk,mode=max
 
   synaptics_build:
-    runs-on: arc-runner-set-frigate
+    runs-on: arc-runner-set-frigate-arm64
     name: Synaptics Build
     needs:
       - arm64_build
+    env:
+      APT_PROXY: http://172.16.0.20:3142
     steps:
       - name: Install build tooling
         run: |
@@ -380,14 +375,10 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re, glob
-          # Per non-scratch FROM:
-          #   1. Route HTTP apt traffic through capybara apt-cacher-ng (caches main archive, avoids Fastly 451 quirk).
-          #   2. Disable pipelining (defensive vs QEMU+Fastly interaction).
-          #   3. apt::Retries for transient errors.
-          #   4. Rewrite security sources to https:// AND don't proxy https — go direct over TLS (HTTPS not affected by the 451 issue, and acng cannot proxy HTTPS upstream).
+          proxy = os.environ.get('APT_PROXY', 'http://172.16.0.25:3142')
           patch_lines = [
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
-              'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
+              f'echo "Acquire::http::Proxy \\"{proxy}\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::https::Proxy \\"DIRECT\\";" >> /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
               'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
