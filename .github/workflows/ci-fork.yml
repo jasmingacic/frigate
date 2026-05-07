@@ -28,6 +28,25 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - name: Inject apt no-pipeline (Fastly+QEMU 451 workaround)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, re, glob
+          for f in glob.glob('docker/**/Dockerfile*', recursive=True):
+              if not os.path.isfile(f):
+                  continue
+              with open(f) as h:
+                  lines = h.read().splitlines()
+              out = []
+              for line in lines:
+                  out.append(line)
+                  if re.match(r'^FROM ', line) and not re.match(r'^FROM\s+scratch(\s|$)', line):
+                      out.append('RUN if [ -d /etc/apt/apt.conf.d ]; then echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; fi')
+              with open(f, 'w') as h:
+                  h.write('\n'.join(out) + '\n')
+              print('patched', f)
+          PY
       - id: setup
         uses: ./.github/actions/setup-fork
         with:
@@ -55,6 +74,25 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - name: Inject apt no-pipeline (Fastly+QEMU 451 workaround)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, re, glob
+          for f in glob.glob('docker/**/Dockerfile*', recursive=True):
+              if not os.path.isfile(f):
+                  continue
+              with open(f) as h:
+                  lines = h.read().splitlines()
+              out = []
+              for line in lines:
+                  out.append(line)
+                  if re.match(r'^FROM ', line) and not re.match(r'^FROM\s+scratch(\s|$)', line):
+                      out.append('RUN if [ -d /etc/apt/apt.conf.d ]; then echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; fi')
+              with open(f, 'w') as h:
+                  h.write('\n'.join(out) + '\n')
+              print('patched', f)
+          PY
       - id: setup
         uses: ./.github/actions/setup-fork
         with:
@@ -93,6 +131,25 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - name: Inject apt no-pipeline (Fastly+QEMU 451 workaround)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, re, glob
+          for f in glob.glob('docker/**/Dockerfile*', recursive=True):
+              if not os.path.isfile(f):
+                  continue
+              with open(f) as h:
+                  lines = h.read().splitlines()
+              out = []
+              for line in lines:
+                  out.append(line)
+                  if re.match(r'^FROM ', line) and not re.match(r'^FROM\s+scratch(\s|$)', line):
+                      out.append('RUN if [ -d /etc/apt/apt.conf.d ]; then echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; fi')
+              with open(f, 'w') as h:
+                  h.write('\n'.join(out) + '\n')
+              print('patched', f)
+          PY
       - id: setup
         uses: ./.github/actions/setup-fork
         with:
@@ -127,6 +184,25 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - name: Inject apt no-pipeline (Fastly+QEMU 451 workaround)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, re, glob
+          for f in glob.glob('docker/**/Dockerfile*', recursive=True):
+              if not os.path.isfile(f):
+                  continue
+              with open(f) as h:
+                  lines = h.read().splitlines()
+              out = []
+              for line in lines:
+                  out.append(line)
+                  if re.match(r'^FROM ', line) and not re.match(r'^FROM\s+scratch(\s|$)', line):
+                      out.append('RUN if [ -d /etc/apt/apt.conf.d ]; then echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; fi')
+              with open(f, 'w') as h:
+                  h.write('\n'.join(out) + '\n')
+              print('patched', f)
+          PY
       - id: setup
         uses: ./.github/actions/setup-fork
         with:
@@ -171,6 +247,25 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - name: Inject apt no-pipeline (Fastly+QEMU 451 workaround)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, re, glob
+          for f in glob.glob('docker/**/Dockerfile*', recursive=True):
+              if not os.path.isfile(f):
+                  continue
+              with open(f) as h:
+                  lines = h.read().splitlines()
+              out = []
+              for line in lines:
+                  out.append(line)
+                  if re.match(r'^FROM ', line) and not re.match(r'^FROM\s+scratch(\s|$)', line):
+                      out.append('RUN if [ -d /etc/apt/apt.conf.d ]; then echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; fi')
+              with open(f, 'w') as h:
+                  h.write('\n'.join(out) + '\n')
+              print('patched', f)
+          PY
       - id: setup
         uses: ./.github/actions/setup-fork
         with:
@@ -200,6 +295,25 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - name: Inject apt no-pipeline (Fastly+QEMU 451 workaround)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, re, glob
+          for f in glob.glob('docker/**/Dockerfile*', recursive=True):
+              if not os.path.isfile(f):
+                  continue
+              with open(f) as h:
+                  lines = h.read().splitlines()
+              out = []
+              for line in lines:
+                  out.append(line)
+                  if re.match(r'^FROM ', line) and not re.match(r'^FROM\s+scratch(\s|$)', line):
+                      out.append('RUN if [ -d /etc/apt/apt.conf.d ]; then echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; fi')
+              with open(f, 'w') as h:
+                  h.write('\n'.join(out) + '\n')
+              print('patched', f)
+          PY
       - id: setup
         uses: ./.github/actions/setup-fork
         with:
