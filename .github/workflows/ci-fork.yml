@@ -37,6 +37,7 @@ jobs:
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
               'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
@@ -89,6 +90,7 @@ jobs:
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
               'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
@@ -152,6 +154,7 @@ jobs:
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
               'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
@@ -211,6 +214,7 @@ jobs:
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
               'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
@@ -280,6 +284,7 @@ jobs:
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
               'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
@@ -334,6 +339,7 @@ jobs:
               'RUN if [ -d /etc/apt/apt.conf.d ]; then '
               'echo "Acquire::http::Proxy \\"http://172.16.0.25:3142\\";" > /etc/apt/apt.conf.d/00proxy; '
               'echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99no-pipeline; '
+              'echo "Acquire::Retries 10;" > /etc/apt/apt.conf.d/99retries; '
               'fi || true',
           ]
           for f in glob.glob('docker/**/Dockerfile*', recursive=True):
